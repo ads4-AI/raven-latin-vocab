@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1d2433">
+<title>Latin vocab test, Wed 18 Nov</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2430;--mut:#6b7280;--acc:#4f6bed;--ok:#1f9d6b;--bad:#d9534f;--warn:#d98a1f;--line:#e4e1d9;--chip:#ecebe6}
+.dark{--bg:#141821;--card:#1f2533;--ink:#eef0f5;--mut:#9aa3b5;--acc:#8ea2ff;--ok:#3fcf94;--bad:#ff7b76;--warn:#f0b35a;--line:#2e3647;--chip:#2a3142}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:18px;line-height:1.4}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.wrap{max-width:640px;margin:0 auto;padding:14px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-size:1.12rem;margin:6px 0}
+.icon{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;min-width:44px;height:44px;font-size:1.1rem;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.tabs button,.chips button{flex:1;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.95rem;font-weight:600;cursor:pointer;padding:6px 8px}
+.tabs button{flex:1 1 calc(33% - 8px)}
+.chips button{flex:0 0 auto;min-height:40px;font-size:.92rem;font-weight:500;background:var(--chip)}
+.tabs button.on,.chips button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:10px 0 4px}
+.bar>div{height:100%;background:var(--ok);width:0;transition:width .3s}
+.stats{display:flex;justify-content:space-between;color:var(--mut);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;min-height:260px;margin:14px 0;padding:22px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.06);cursor:pointer;user-select:none;position:relative}
+.card .lab{position:absolute;top:12px;left:16px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+.card .sec{position:absolute;top:12px;right:16px;font-size:.78rem;color:var(--mut)}
+.card .star{position:absolute;bottom:10px;right:14px;color:var(--warn);font-size:1.1rem}
+.big{font-size:1.75rem;font-weight:650;line-height:1.25;word-break:break-word}
+.sub{color:var(--mut);margin-top:12px;font-size:1rem}
+.hint{color:var(--mut);font-size:.85rem;text-align:center}
+.btns{display:flex;gap:10px}
+.btns button,.main{flex:1;min-height:58px;border:none;border-radius:16px;font-size:1.08rem;font-weight:700;cursor:pointer;color:#fff}
+.b-bad{background:var(--warn)}.b-ok{background:var(--ok)}.main{background:var(--acc);width:100%}
+.b-sec{background:var(--chip)!important;color:var(--ink)!important;border:1px solid var(--line)!important}
+input[type=text]{width:100%;font-size:1.35rem;padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);outline:none}
+input[type=text]:focus{border-color:var(--acc)}
+.acc{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.acc button{min-width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--chip);color:var(--ink);font-size:1.1rem;cursor:pointer}
+.fb{margin:10px 0;padding:12px 14px;border-radius:14px;font-size:1.05rem;display:none}
+.fb.ok{display:block;background:rgba(31,157,107,.14);color:var(--ok)}
+.fb.bad{display:block;background:rgba(217,83,79,.13);color:var(--bad)}
+.fb.near{display:block;background:rgba(217,138,31,.14);color:var(--warn)}
+.fb b{color:var(--ink)}
+.opts{display:grid;gap:10px}
+.opts button{min-height:58px;text-align:left;padding:12px 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:1.05rem;cursor:pointer}
+.opts button.right{border-color:var(--ok);background:rgba(31,157,107,.14)}
+.opts button.wrong{border-color:var(--bad);background:rgba(217,83,79,.13)}
+.done{text-align:center;padding:24px 10px}
+.done .tick{font-size:4rem;color:var(--ok)}
+.small{font-size:.85rem;color:var(--mut)}
+.link{background:none;border:none;color:var(--acc);text-decoration:underline;cursor:pointer;font-size:.9rem;padding:6px}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+#confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.7}}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:.95rem;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Latin vocab test, Wed 18 Nov</h1>
+    <div style="display:flex;gap:6px">
+      <button class="icon" id="dirBtn" title="Swap direction">EN→LA</button>
+      <button class="icon" id="themeBtn" title="Dark / light">◐</button>
+    </div>
+  </header>
+
+  <div class="row tabs" id="modes">
+    <button data-m="cards" class="on">Flashcards</button>
+    <button data-m="type">Type it</button>
+    <button data-m="quiz">Quiz</button>
+    <button data-m="parts">Parts</button>
+    <button data-m="endings">Endings</button>
+  </div>
+  <div class="row chips" id="decks"></div>
+
+  <div class="bar"><div id="prog"></div></div>
+  <div class="stats"><span id="sScore">Score 0</span><span id="sStreak">Streak 0</span><span id="sLeft">0 left</span></div>
+
+  <div id="stage"></div>
+  <div style="text-align:center;margin-top:6px">
+    <button class="link" id="restart">↻ Shuffle &amp; restart</button>
+    <button class="link" id="clearHard">Clear ★ Hard ones</button>
+  </div>
+  <p class="small" style="text-align:center"><span id="total"></span> words. Progress saves on this device.</p>
+</div>
+<div id="confetti"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const WORDS = [{"id": "w1", "s": "verb", "la": "aedificō, aedificāre, aedificāvī", "lemma": "aedificō", "en": "build", "meanings": ["build"], "parts": ["aedificō", "aedificāre", "aedificāvī"]}, {"id": "w2", "s": "verb", "la": "appāreō, appārēre, appāruī", "lemma": "appāreō", "en": "appear", "meanings": ["appear"], "parts": ["appāreō", "appārēre", "appāruī"]}, {"id": "w3", "s": "other", "la": "auxilium", "lemma": "auxilium", "en": "help", "meanings": ["help"]}, {"id": "w4", "s": "verb", "la": "cōnsentiō, cōnsentīre, cōnsēnsī", "lemma": "cōnsentiō", "en": "agree", "meanings": ["agree"], "parts": ["cōnsentiō", "cōnsentīre", "cōnsēnsī"]}, {"id": "w5", "s": "other", "la": "cōnsilium", "lemma": "cōnsilium", "en": "plan, idea", "meanings": ["plan", "idea"]}, {"id": "w6", "s": "other", "la": "cotīdiē", "lemma": "cotīdiē", "en": "every day", "meanings": ["every day", "everyday", "each day", "daily"]}, {"id": "w7", "s": "other", "la": "deinde", "lemma": "deinde", "en": "then", "meanings": ["then", "next"]}, {"id": "w8", "s": "verb", "la": "effugiō, effugere, effūgī", "lemma": "effugiō", "en": "escape", "meanings": ["escape"], "parts": ["effugiō", "effugere", "effūgī"]}, {"id": "w9", "s": "other", "la": "facilis", "lemma": "facilis", "en": "easy", "meanings": ["easy"]}, {"id": "w10", "s": "other", "la": "inter", "lemma": "inter", "en": "among", "meanings": ["among", "amongst"]}, {"id": "w11", "s": "other", "la": "ita", "lemma": "ita", "en": "in this way", "meanings": ["in this way", "this way", "in this manner"]}, {"id": "w12", "s": "other", "la": "melior", "lemma": "melior", "en": "better", "meanings": ["better"]}, {"id": "w13", "s": "other", "la": "miser", "lemma": "miser", "en": "wretched, miserable", "meanings": ["wretched", "miserable"]}, {"id": "w14", "s": "verb", "la": "nāvigō, nāvigāre, nāvigāvī", "lemma": "nāvigō", "en": "sail", "meanings": ["sail"], "parts": ["nāvigō", "nāvigāre", "nāvigāvī"]}, {"id": "w15", "s": "other", "la": "nōnne?", "lemma": "nōnne?", "en": "surely?", "meanings": ["surely", "surely?"]}, {"id": "w16", "s": "other", "la": "paucī", "lemma": "paucī", "en": "a few", "meanings": ["a few", "few"]}, {"id": "w17", "s": "verb", "la": "pereō, perīre, periī", "lemma": "pereō", "en": "die, perish", "meanings": ["die", "perish"], "parts": ["pereō", "perīre", "periī"]}, {"id": "w18", "s": "verb", "la": "pōnō, pōnere, posuī", "lemma": "pōnō", "en": "place, put up", "meanings": ["place", "put up"], "parts": ["pōnō", "pōnere", "posuī"]}, {"id": "w19", "s": "other", "la": "summus", "lemma": "summus", "en": "highest, greatest, top", "meanings": ["highest", "greatest", "top"]}, {"id": "w20", "s": "verb", "la": "tollō, tollere, sustulī", "lemma": "tollō", "en": "raise, lift up", "meanings": ["raise", "lift up", "lift"], "parts": ["tollō", "tollere", "sustulī"]}, {"id": "w21", "s": "other", "la": "trīstis", "lemma": "trīstis", "en": "sad", "meanings": ["sad"]}, {"id": "w22", "s": "verb", "la": "vertō, vertere, vertī", "lemma": "vertō", "en": "turn", "meanings": ["turn"], "parts": ["vertō", "vertere", "vertī"]}];
+const FORMS = [{"id": "e-w1-pres-1sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "pres", "person": "1sg", "la": "aedificō", "hint": false}, {"id": "e-w1-pres-2sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "pres", "person": "2sg", "la": "aedificās", "hint": false}, {"id": "e-w1-pres-3sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "pres", "person": "3sg", "la": "aedificat", "hint": false}, {"id": "e-w1-pres-1pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "pres", "person": "1pl", "la": "aedificāmus", "hint": false}, {"id": "e-w1-pres-2pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "pres", "person": "2pl", "la": "aedificātis", "hint": false}, {"id": "e-w1-pres-3pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "pres", "person": "3pl", "la": "aedificant", "hint": false}, {"id": "e-w1-impf-1sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "impf", "person": "1sg", "la": "aedificābam", "hint": false}, {"id": "e-w1-impf-2sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "impf", "person": "2sg", "la": "aedificābās", "hint": false}, {"id": "e-w1-impf-3sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "impf", "person": "3sg", "la": "aedificābat", "hint": false}, {"id": "e-w1-impf-1pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "impf", "person": "1pl", "la": "aedificābāmus", "hint": false}, {"id": "e-w1-impf-2pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "impf", "person": "2pl", "la": "aedificābātis", "hint": false}, {"id": "e-w1-impf-3pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "impf", "person": "3pl", "la": "aedificābant", "hint": false}, {"id": "e-w1-perf-1sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "perf", "person": "1sg", "la": "aedificāvī", "hint": false}, {"id": "e-w1-perf-2sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "perf", "person": "2sg", "la": "aedificāvistī", "hint": false}, {"id": "e-w1-perf-3sg", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "perf", "person": "3sg", "la": "aedificāvit", "hint": false}, {"id": "e-w1-perf-1pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "perf", "person": "1pl", "la": "aedificāvimus", "hint": false}, {"id": "e-w1-perf-2pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "perf", "person": "2pl", "la": "aedificāvistis", "hint": false}, {"id": "e-w1-perf-3pl", "vid": "w1", "lemma": "aedificō", "en": "build", "tense": "perf", "person": "3pl", "la": "aedificāvērunt", "hint": false}, {"id": "e-w2-pres-1sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "pres", "person": "1sg", "la": "appāreō", "hint": false}, {"id": "e-w2-pres-2sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "pres", "person": "2sg", "la": "appārēs", "hint": false}, {"id": "e-w2-pres-3sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "pres", "person": "3sg", "la": "appāret", "hint": false}, {"id": "e-w2-pres-1pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "pres", "person": "1pl", "la": "appārēmus", "hint": false}, {"id": "e-w2-pres-2pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "pres", "person": "2pl", "la": "appārētis", "hint": false}, {"id": "e-w2-pres-3pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "pres", "person": "3pl", "la": "appārent", "hint": false}, {"id": "e-w2-impf-1sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "impf", "person": "1sg", "la": "appārēbam", "hint": false}, {"id": "e-w2-impf-2sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "impf", "person": "2sg", "la": "appārēbās", "hint": false}, {"id": "e-w2-impf-3sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "impf", "person": "3sg", "la": "appārēbat", "hint": false}, {"id": "e-w2-impf-1pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "impf", "person": "1pl", "la": "appārēbāmus", "hint": false}, {"id": "e-w2-impf-2pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "impf", "person": "2pl", "la": "appārēbātis", "hint": false}, {"id": "e-w2-impf-3pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "impf", "person": "3pl", "la": "appārēbant", "hint": false}, {"id": "e-w2-perf-1sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "perf", "person": "1sg", "la": "appāruī", "hint": false}, {"id": "e-w2-perf-2sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "perf", "person": "2sg", "la": "appāruistī", "hint": false}, {"id": "e-w2-perf-3sg", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "perf", "person": "3sg", "la": "appāruit", "hint": false}, {"id": "e-w2-perf-1pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "perf", "person": "1pl", "la": "appāruimus", "hint": false}, {"id": "e-w2-perf-2pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "perf", "person": "2pl", "la": "appāruistis", "hint": false}, {"id": "e-w2-perf-3pl", "vid": "w2", "lemma": "appāreō", "en": "appear", "tense": "perf", "person": "3pl", "la": "appāruērunt", "hint": false}, {"id": "e-w4-pres-1sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "pres", "person": "1sg", "la": "cōnsentiō", "hint": false}, {"id": "e-w4-pres-2sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "pres", "person": "2sg", "la": "cōnsentīs", "hint": false}, {"id": "e-w4-pres-3sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "pres", "person": "3sg", "la": "cōnsentit", "hint": false}, {"id": "e-w4-pres-1pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "pres", "person": "1pl", "la": "cōnsentīmus", "hint": false}, {"id": "e-w4-pres-2pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "pres", "person": "2pl", "la": "cōnsentītis", "hint": false}, {"id": "e-w4-pres-3pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "pres", "person": "3pl", "la": "cōnsentiunt", "hint": false}, {"id": "e-w4-impf-1sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "impf", "person": "1sg", "la": "cōnsentiēbam", "hint": false}, {"id": "e-w4-impf-2sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "impf", "person": "2sg", "la": "cōnsentiēbās", "hint": false}, {"id": "e-w4-impf-3sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "impf", "person": "3sg", "la": "cōnsentiēbat", "hint": false}, {"id": "e-w4-impf-1pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "impf", "person": "1pl", "la": "cōnsentiēbāmus", "hint": false}, {"id": "e-w4-impf-2pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "impf", "person": "2pl", "la": "cōnsentiēbātis", "hint": false}, {"id": "e-w4-impf-3pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "impf", "person": "3pl", "la": "cōnsentiēbant", "hint": false}, {"id": "e-w4-perf-1sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "perf", "person": "1sg", "la": "cōnsēnsī", "hint": false}, {"id": "e-w4-perf-2sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "perf", "person": "2sg", "la": "cōnsēnsistī", "hint": false}, {"id": "e-w4-perf-3sg", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "perf", "person": "3sg", "la": "cōnsēnsit", "hint": false}, {"id": "e-w4-perf-1pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "perf", "person": "1pl", "la": "cōnsēnsimus", "hint": false}, {"id": "e-w4-perf-2pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "perf", "person": "2pl", "la": "cōnsēnsistis", "hint": false}, {"id": "e-w4-perf-3pl", "vid": "w4", "lemma": "cōnsentiō", "en": "agree", "tense": "perf", "person": "3pl", "la": "cōnsēnsērunt", "hint": false}, {"id": "e-w8-pres-1sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "pres", "person": "1sg", "la": "effugiō", "hint": false}, {"id": "e-w8-pres-2sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "pres", "person": "2sg", "la": "effugis", "hint": false}, {"id": "e-w8-pres-3sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "pres", "person": "3sg", "la": "effugit", "hint": false}, {"id": "e-w8-pres-1pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "pres", "person": "1pl", "la": "effugimus", "hint": false}, {"id": "e-w8-pres-2pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "pres", "person": "2pl", "la": "effugitis", "hint": false}, {"id": "e-w8-pres-3pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "pres", "person": "3pl", "la": "effugiunt", "hint": false}, {"id": "e-w8-impf-1sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "impf", "person": "1sg", "la": "effugiēbam", "hint": false}, {"id": "e-w8-impf-2sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "impf", "person": "2sg", "la": "effugiēbās", "hint": false}, {"id": "e-w8-impf-3sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "impf", "person": "3sg", "la": "effugiēbat", "hint": false}, {"id": "e-w8-impf-1pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "impf", "person": "1pl", "la": "effugiēbāmus", "hint": false}, {"id": "e-w8-impf-2pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "impf", "person": "2pl", "la": "effugiēbātis", "hint": false}, {"id": "e-w8-impf-3pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "impf", "person": "3pl", "la": "effugiēbant", "hint": false}, {"id": "e-w8-perf-1sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "perf", "person": "1sg", "la": "effūgī", "hint": false}, {"id": "e-w8-perf-2sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "perf", "person": "2sg", "la": "effūgistī", "hint": false}, {"id": "e-w8-perf-3sg", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "perf", "person": "3sg", "la": "effūgit", "hint": false}, {"id": "e-w8-perf-1pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "perf", "person": "1pl", "la": "effūgimus", "hint": false}, {"id": "e-w8-perf-2pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "perf", "person": "2pl", "la": "effūgistis", "hint": false}, {"id": "e-w8-perf-3pl", "vid": "w8", "lemma": "effugiō", "en": "escape", "tense": "perf", "person": "3pl", "la": "effūgērunt", "hint": false}, {"id": "e-w14-pres-1sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "pres", "person": "1sg", "la": "nāvigō", "hint": false}, {"id": "e-w14-pres-2sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "pres", "person": "2sg", "la": "nāvigās", "hint": false}, {"id": "e-w14-pres-3sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "pres", "person": "3sg", "la": "nāvigat", "hint": false}, {"id": "e-w14-pres-1pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "pres", "person": "1pl", "la": "nāvigāmus", "hint": false}, {"id": "e-w14-pres-2pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "pres", "person": "2pl", "la": "nāvigātis", "hint": false}, {"id": "e-w14-pres-3pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "pres", "person": "3pl", "la": "nāvigant", "hint": false}, {"id": "e-w14-impf-1sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "impf", "person": "1sg", "la": "nāvigābam", "hint": false}, {"id": "e-w14-impf-2sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "impf", "person": "2sg", "la": "nāvigābās", "hint": false}, {"id": "e-w14-impf-3sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "impf", "person": "3sg", "la": "nāvigābat", "hint": false}, {"id": "e-w14-impf-1pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "impf", "person": "1pl", "la": "nāvigābāmus", "hint": false}, {"id": "e-w14-impf-2pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "impf", "person": "2pl", "la": "nāvigābātis", "hint": false}, {"id": "e-w14-impf-3pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "impf", "person": "3pl", "la": "nāvigābant", "hint": false}, {"id": "e-w14-perf-1sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "perf", "person": "1sg", "la": "nāvigāvī", "hint": false}, {"id": "e-w14-perf-2sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "perf", "person": "2sg", "la": "nāvigāvistī", "hint": false}, {"id": "e-w14-perf-3sg", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "perf", "person": "3sg", "la": "nāvigāvit", "hint": false}, {"id": "e-w14-perf-1pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "perf", "person": "1pl", "la": "nāvigāvimus", "hint": false}, {"id": "e-w14-perf-2pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "perf", "person": "2pl", "la": "nāvigāvistis", "hint": false}, {"id": "e-w14-perf-3pl", "vid": "w14", "lemma": "nāvigō", "en": "sail", "tense": "perf", "person": "3pl", "la": "nāvigāvērunt", "hint": false}, {"id": "e-w17-pres-1sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "pres", "person": "1sg", "la": "pereō", "hint": false}, {"id": "e-w17-pres-2sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "pres", "person": "2sg", "la": "perīs", "hint": false}, {"id": "e-w17-pres-3sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "pres", "person": "3sg", "la": "perit", "hint": false}, {"id": "e-w17-pres-1pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "pres", "person": "1pl", "la": "perīmus", "hint": false}, {"id": "e-w17-pres-2pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "pres", "person": "2pl", "la": "perītis", "hint": false}, {"id": "e-w17-pres-3pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "pres", "person": "3pl", "la": "pereunt", "hint": false}, {"id": "e-w17-impf-1sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "impf", "person": "1sg", "la": "perībam", "hint": false}, {"id": "e-w17-impf-2sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "impf", "person": "2sg", "la": "perībās", "hint": false}, {"id": "e-w17-impf-3sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "impf", "person": "3sg", "la": "perībat", "hint": false}, {"id": "e-w17-impf-1pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "impf", "person": "1pl", "la": "perībāmus", "hint": false}, {"id": "e-w17-impf-2pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "impf", "person": "2pl", "la": "perībātis", "hint": false}, {"id": "e-w17-impf-3pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "impf", "person": "3pl", "la": "perībant", "hint": false}, {"id": "e-w17-perf-1sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "perf", "person": "1sg", "la": "periī", "hint": false}, {"id": "e-w17-perf-2sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "perf", "person": "2sg", "la": "periistī", "hint": false}, {"id": "e-w17-perf-3sg", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "perf", "person": "3sg", "la": "periit", "hint": false}, {"id": "e-w17-perf-1pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "perf", "person": "1pl", "la": "periimus", "hint": false}, {"id": "e-w17-perf-2pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "perf", "person": "2pl", "la": "periistis", "hint": false}, {"id": "e-w17-perf-3pl", "vid": "w17", "lemma": "pereō", "en": "die, perish", "tense": "perf", "person": "3pl", "la": "periērunt", "hint": false}, {"id": "e-w18-pres-1sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "pres", "person": "1sg", "la": "pōnō", "hint": false}, {"id": "e-w18-pres-2sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "pres", "person": "2sg", "la": "pōnis", "hint": false}, {"id": "e-w18-pres-3sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "pres", "person": "3sg", "la": "pōnit", "hint": false}, {"id": "e-w18-pres-1pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "pres", "person": "1pl", "la": "pōnimus", "hint": false}, {"id": "e-w18-pres-2pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "pres", "person": "2pl", "la": "pōnitis", "hint": false}, {"id": "e-w18-pres-3pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "pres", "person": "3pl", "la": "pōnunt", "hint": false}, {"id": "e-w18-impf-1sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "impf", "person": "1sg", "la": "pōnēbam", "hint": false}, {"id": "e-w18-impf-2sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "impf", "person": "2sg", "la": "pōnēbās", "hint": false}, {"id": "e-w18-impf-3sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "impf", "person": "3sg", "la": "pōnēbat", "hint": false}, {"id": "e-w18-impf-1pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "impf", "person": "1pl", "la": "pōnēbāmus", "hint": false}, {"id": "e-w18-impf-2pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "impf", "person": "2pl", "la": "pōnēbātis", "hint": false}, {"id": "e-w18-impf-3pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "impf", "person": "3pl", "la": "pōnēbant", "hint": false}, {"id": "e-w18-perf-1sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "perf", "person": "1sg", "la": "posuī", "hint": false}, {"id": "e-w18-perf-2sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "perf", "person": "2sg", "la": "posuistī", "hint": false}, {"id": "e-w18-perf-3sg", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "perf", "person": "3sg", "la": "posuit", "hint": false}, {"id": "e-w18-perf-1pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "perf", "person": "1pl", "la": "posuimus", "hint": false}, {"id": "e-w18-perf-2pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "perf", "person": "2pl", "la": "posuistis", "hint": false}, {"id": "e-w18-perf-3pl", "vid": "w18", "lemma": "pōnō", "en": "place, put up", "tense": "perf", "person": "3pl", "la": "posuērunt", "hint": false}, {"id": "e-w20-pres-1sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "pres", "person": "1sg", "la": "tollō", "hint": false}, {"id": "e-w20-pres-2sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "pres", "person": "2sg", "la": "tollis", "hint": false}, {"id": "e-w20-pres-3sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "pres", "person": "3sg", "la": "tollit", "hint": false}, {"id": "e-w20-pres-1pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "pres", "person": "1pl", "la": "tollimus", "hint": false}, {"id": "e-w20-pres-2pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "pres", "person": "2pl", "la": "tollitis", "hint": false}, {"id": "e-w20-pres-3pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "pres", "person": "3pl", "la": "tollunt", "hint": false}, {"id": "e-w20-impf-1sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "impf", "person": "1sg", "la": "tollēbam", "hint": false}, {"id": "e-w20-impf-2sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "impf", "person": "2sg", "la": "tollēbās", "hint": false}, {"id": "e-w20-impf-3sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "impf", "person": "3sg", "la": "tollēbat", "hint": false}, {"id": "e-w20-impf-1pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "impf", "person": "1pl", "la": "tollēbāmus", "hint": false}, {"id": "e-w20-impf-2pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "impf", "person": "2pl", "la": "tollēbātis", "hint": false}, {"id": "e-w20-impf-3pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "impf", "person": "3pl", "la": "tollēbant", "hint": false}, {"id": "e-w20-perf-1sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "perf", "person": "1sg", "la": "sustulī", "hint": false}, {"id": "e-w20-perf-2sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "perf", "person": "2sg", "la": "sustulistī", "hint": false}, {"id": "e-w20-perf-3sg", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "perf", "person": "3sg", "la": "sustulit", "hint": false}, {"id": "e-w20-perf-1pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "perf", "person": "1pl", "la": "sustulimus", "hint": false}, {"id": "e-w20-perf-2pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "perf", "person": "2pl", "la": "sustulistis", "hint": false}, {"id": "e-w20-perf-3pl", "vid": "w20", "lemma": "tollō", "en": "raise, lift up", "tense": "perf", "person": "3pl", "la": "sustulērunt", "hint": false}, {"id": "e-w22-pres-1sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "pres", "person": "1sg", "la": "vertō", "hint": false}, {"id": "e-w22-pres-2sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "pres", "person": "2sg", "la": "vertis", "hint": false}, {"id": "e-w22-pres-3sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "pres", "person": "3sg", "la": "vertit", "hint": true}, {"id": "e-w22-pres-1pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "pres", "person": "1pl", "la": "vertimus", "hint": true}, {"id": "e-w22-pres-2pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "pres", "person": "2pl", "la": "vertitis", "hint": false}, {"id": "e-w22-pres-3pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "pres", "person": "3pl", "la": "vertunt", "hint": false}, {"id": "e-w22-impf-1sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "impf", "person": "1sg", "la": "vertēbam", "hint": false}, {"id": "e-w22-impf-2sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "impf", "person": "2sg", "la": "vertēbās", "hint": false}, {"id": "e-w22-impf-3sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "impf", "person": "3sg", "la": "vertēbat", "hint": false}, {"id": "e-w22-impf-1pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "impf", "person": "1pl", "la": "vertēbāmus", "hint": false}, {"id": "e-w22-impf-2pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "impf", "person": "2pl", "la": "vertēbātis", "hint": false}, {"id": "e-w22-impf-3pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "impf", "person": "3pl", "la": "vertēbant", "hint": false}, {"id": "e-w22-perf-1sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "perf", "person": "1sg", "la": "vertī", "hint": false}, {"id": "e-w22-perf-2sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "perf", "person": "2sg", "la": "vertistī", "hint": false}, {"id": "e-w22-perf-3sg", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "perf", "person": "3sg", "la": "vertit", "hint": true}, {"id": "e-w22-perf-1pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "perf", "person": "1pl", "la": "vertimus", "hint": true}, {"id": "e-w22-perf-2pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "perf", "person": "2pl", "la": "vertistis", "hint": false}, {"id": "e-w22-perf-3pl", "vid": "w22", "lemma": "vertō", "en": "turn", "tense": "perf", "person": "3pl", "la": "vertērunt", "hint": false}];
+const WORD = id => WORDS.find(w => w.id===id);
+const VERBS = WORDS.filter(w => w.s==="verb");
+const LS = k => "raven-la-18nov-" + k;
+const load = (k,d) => { try { const v = localStorage.getItem(LS(k)); return v===null ? d : JSON.parse(v); } catch(e){ return d; } };
+const save = (k,v) => { try { localStorage.setItem(LS(k), JSON.stringify(v)); } catch(e){} };
+
+let st = { mode: load("mode","cards"), deck: load("deck","All"), dir: load("dir","en"), dark: load("dark", window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) };
+let hard = new Set(load("hard", []));
+let queue = [], cur = null, flipped = false, answered = false, score = 0, streak = 0, best = 0, seen = 0, startCount = 0;
+
+const $ = id => document.getElementById(id);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+function toast(t){ const e=$("toast"); e.textContent=t; e.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>e.classList.remove("show"),1600); }
+
+const TENSE_LAB = {pres:"present", impf:"imperfect", perf:"perfect"};
+const PERSON_LAB = { "1sg":"I", "2sg":"you", "3sg":"he/she", "1pl":"we", "2pl":"you (pl)", "3pl":"they" };
+const ENVERB = {
+  build:{inf:"build", pres3:"builds", ing:"building", past:"built", pp:"built"},
+  appear:{inf:"appear", pres3:"appears", ing:"appearing", past:"appeared", pp:"appeared"},
+  agree:{inf:"agree", pres3:"agrees", ing:"agreeing", past:"agreed", pp:"agreed"},
+  escape:{inf:"escape", pres3:"escapes", ing:"escaping", past:"escaped", pp:"escaped"},
+  sail:{inf:"sail", pres3:"sails", ing:"sailing", past:"sailed", pp:"sailed"},
+  die:{inf:"die", pres3:"dies", ing:"dying", past:"died", pp:"died"},
+  perish:{inf:"perish", pres3:"perishes", ing:"perishing", past:"perished", pp:"perished"},
+  place:{inf:"place", pres3:"places", ing:"placing", past:"placed", pp:"placed"},
+  "put up":{inf:"put up", pres3:"puts up", ing:"putting up", past:"put up", pp:"put up"},
+  raise:{inf:"raise", pres3:"raises", ing:"raising", past:"raised", pp:"raised"},
+  "lift up":{inf:"lift up", pres3:"lifts up", ing:"lifting up", past:"lifted up", pp:"lifted up"},
+  lift:{inf:"lift", pres3:"lifts", ing:"lifting", past:"lifted", pp:"lifted"},
+  turn:{inf:"turn", pres3:"turns", ing:"turning", past:"turned", pp:"turned"}
+};
+const PRONS = {
+  "1sg":["i"],
+  "2sg":["you","you sg","you sing","you singular","thou"],
+  "3sg":["he","she","it","he/she","he/she/it","he or she","s/he"],
+  "1pl":["we"],
+  "2pl":["you","you pl","you plural","you all","you lot"],
+  "3pl":["they"]
+};
+const BE_PRES = { "1sg":["am"], "2sg":["are"], "3sg":["is"], "1pl":["are"], "2pl":["are"], "3pl":["are"] };
+const BE_PAST = { "1sg":["was"], "2sg":["were"], "3sg":["was"], "1pl":["were"], "2pl":["were"], "3pl":["were"] };
+const HAVE = { "1sg":["have"], "2sg":["have"], "3sg":["has"], "1pl":["have"], "2pl":["have"], "3pl":["have"] };
+
+function verbMeanings(f){
+  const w = WORD(f.vid);
+  return (w.meanings||[w.en]).filter(m => ENVERB[m]);
+}
+function endingPrimary(f){
+  const ms = verbMeanings(f);
+  const first = ENVERB[ms[0]];
+  const p = PERSON_LAB[f.person];
+  let main;
+  if (f.tense==="pres"){
+    const v = f.person==="3sg" ? first.pres3 : first.inf;
+    main = `${p} ${v}`;
+  } else if (f.tense==="impf"){
+    const be = f.person==="1sg"||f.person==="3sg" ? "was" : "were";
+    main = `${p} ${be} ${first.ing} / used to ${first.inf}`;
+  } else {
+    main = `${p} ${first.past} / have ${first.pp}`.replace("he/she have","he/she has");
+    if (f.person==="3sg") main = `${p} ${first.past} / has ${first.pp}`;
+  }
+  if (ms.length>1){
+    const extra = ms.slice(1).map(m => {
+      const e = ENVERB[m];
+      if (f.tense==="pres") return f.person==="3sg" ? e.pres3 : e.inf;
+      if (f.tense==="impf") return e.ing;
+      return e.past;
+    });
+    main = main + " / " + extra.join(" / ");
+  }
+  return main;
+}
+function endingVariants(f){
+  const out = new Set();
+  const prons = PRONS[f.person].slice();
+  if (f.person==="3sg") prons.push("they"); // singular they
+  for (const meaning of verbMeanings(f)){
+    const e = ENVERB[meaning];
+    for (const p of prons){
+      const isThey3sg = f.person==="3sg" && p==="they";
+      if (f.tense==="pres"){
+        const v = (f.person==="3sg" && !isThey3sg) ? e.pres3 : e.inf;
+        out.add(`${p} ${v}`);
+        const bes = isThey3sg ? ["are"] : BE_PRES[f.person];
+        for (const b of bes) out.add(`${p} ${b} ${e.ing}`);
+      } else if (f.tense==="impf"){
+        const bes = isThey3sg ? ["were"] : BE_PAST[f.person];
+        for (const b of bes) out.add(`${p} ${b} ${e.ing}`);
+        out.add(`${p} used to ${e.inf}`);
+        out.add(`${p} would ${e.inf}`);
+      } else {
+        out.add(`${p} ${e.past}`);
+        const hs = isThey3sg ? ["have"] : HAVE[f.person];
+        for (const h of hs) out.add(`${p} ${h} ${e.pp}`);
+        out.add(`${p} did ${e.inf}`);
+      }
+    }
+  }
+  return [...out];
+}
+
+function isEndings(){ return st.mode==="endings"; }
+function isParts(){ return st.mode==="parts"; }
+
+function vocabSecs(){ return [["All","All"],["verb","Verbs"],["other","Other words"],["Hard","★ Hard ones"]]; }
+function partsSecs(){ return [["All","All verbs"],["Hard","★ Hard ones"]]; }
+function endingSecs(){ return [["All","All endings"],["pres","Present"],["impf","Imperfect"],["perf","Perfect"],["Hard","★ Hard ones"]]; }
+
+function deckItems(){
+  if (isEndings()){
+    if (st.deck==="Hard") return FORMS.filter(f => hard.has(f.id));
+    if (st.deck==="All") return FORMS;
+    return FORMS.filter(f => f.tense===st.deck);
+  }
+  if (isParts()){
+    if (st.deck==="Hard") return VERBS.filter(w => hard.has("p-"+w.id));
+    return VERBS;
+  }
+  if (st.deck==="All") return WORDS;
+  if (st.deck==="Hard") return WORDS.filter(w => hard.has(w.id));
+  return WORDS.filter(w => w.s===st.deck);
+}
+
+function itemId(item){
+  if (isEndings()) return item.id;
+  if (isParts()) return "p-"+item.id;
+  return item.id;
+}
+
+function promptOf(item){
+  if (isEndings()) return st.dir==="en" ? endingPrimary(item) : item.la;
+  if (isParts()) return st.dir==="en" ? item.en : item.la;
+  return st.dir==="en" ? item.en : item.la;
+}
+function answerOf(item){
+  if (isEndings()) return st.dir==="en" ? item.la : endingPrimary(item);
+  if (isParts()) return st.dir==="en" ? item.la : item.en;
+  return st.dir==="en" ? (item.parts ? item.lemma : item.la) : item.en;
+}
+function answerShown(item){
+  if (isEndings()) return st.dir==="en" ? item.la : endingPrimary(item);
+  if (isParts()) return st.dir==="en" ? item.la : item.en;
+  return st.dir==="en" ? item.la : item.en;
+}
+
+/* ---- normalisation and checking ---- */
+function norm(s){
+  return String(s).toLowerCase()
+    .replace(/œ/g,"oe").replace(/æ/g,"ae")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[’‘`´]/g,"'")
+    .replace(/\b(i|you|we|they|he|she|it)'m\b/g,"$1 am")
+    .replace(/\b(i|you|we|they)'ve\b/g,"$1 have")
+    .replace(/\b(he|she|it)'s\b/g,"$1 is")
+    .replace(/\b(i|you|we|they|he|she|it)'d\b/g,"$1 would")
+    .replace(/\b(you|we|they|he|she|it)'re\b/g,"$1 are")
+    .replace(/\bdon't\b/g,"do not").replace(/\bdidn't\b/g,"did not")
+    .replace(/'/g," ")
+    .replace(/[?!¡¿.,;:…"«»()\-]/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function lev(a,b){
+  const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let p=Array.from({length:n+1},(_,i)=>i);
+  for(let i=1;i<=m;i++){ let c=[i]; for(let j=1;j<=n;j++) c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1)); p=c; }
+  return p[n];
+}
+function bestLev(g, vs){
+  return Math.min(...vs.map(v => lev(g, v)));
+}
+function closeEnough(g, vs){
+  const d = bestLev(g, vs);
+  const tol = Math.max(1, Math.floor(Math.min(...vs.map(v=>v.length))/8));
+  return d<=tol;
+}
+function vocabLatinVariants(w){
+  const v = new Set();
+  const add = s => { const n=norm(s); if(n) v.add(n); };
+  add(w.la); add(w.lemma);
+  if (w.parts) w.parts.forEach(add);
+  add(w.lemma.replace(/\?$/,""));
+  add(w.la.replace(/\?$/,""));
+  return [...v];
+}
+function vocabEnglishVariants(w){
+  const v = new Set();
+  const add = s => { const n=norm(s); if(n) v.add(n); };
+  add(w.en);
+  (w.meanings||[]).forEach(add);
+  // allow "plan, idea" written as "plan and idea" etc already split
+  return [...v];
+}
+function checkVocab(input, w){
+  const g = norm(input); if (!g) return "bad";
+  const toLa = st.dir==="en";
+  const vs = (toLa ? vocabLatinVariants(w) : vocabEnglishVariants(w));
+  if (vs.includes(g)) return "ok";
+  // typo tolerance on spaceless forms
+  const gs=g.replace(/ /g,""), vss=vs.map(x=>x.replace(/ /g,""));
+  if (vss.includes(gs)) return "ok";
+  return closeEnough(gs, vss) ? "near" : "bad";
+}
+function checkParts(input, w){
+  const g = norm(input); if (!g) return "bad";
+  const toLa = st.dir==="en";
+  if (!toLa) return checkVocab(input, w);
+  const expected = w.parts.map(norm);
+  const bits = g.split(/[,\s]+/).filter(Boolean);
+  const joined = expected.join(" ");
+  if (g===joined) return "ok";
+  if (bits.length>=3 && expected.every((p,i)=>bits[i]===p)) return "ok";
+  // contracted eō perfect 2sg/2pl accepted in display of parts? parts are lemma list, not endings
+  const gs=g.replace(/ /g,""), exp=joined.replace(/ /g,"");
+  if (gs===exp) return "ok";
+  return closeEnough(gs, [exp]) ? "near" : "bad";
+}
+function checkEnding(input, f){
+  const g = norm(input); if (!g) return "bad";
+  const toLa = st.dir==="en";
+  if (toLa){
+    const vs = [norm(f.la)];
+    // accept contracted perfect of pereō: peristi / persistis for periisti / periistis
+    if (f.vid==="w17" && f.tense==="perf" && f.person==="2sg") vs.push(norm("perīstī"));
+    if (f.vid==="w17" && f.tense==="perf" && f.person==="2pl") vs.push(norm("perīstis"));
+    if (vs.includes(g) || vs.map(x=>x.replace(/ /g,"")).includes(g.replace(/ /g,""))) return "ok";
+    return closeEnough(g.replace(/ /g,""), vs.map(x=>x.replace(/ /g,""))) ? "near" : "bad";
+  }
+  const vs = endingVariants(f).map(norm);
+  if (vs.includes(g)) return "ok";
+  if (vs.map(x=>x.replace(/ /g,"")).includes(g.replace(/ /g,""))) return "ok";
+  // A perfect match for a different tense or person of the same verb is wrong, not a typo.
+  const others = FORMS.filter(x => x.vid===f.vid && x.id!==f.id);
+  for (const o of others){
+    const ovs = endingVariants(o).map(norm);
+    if (ovs.includes(g) || ovs.map(x=>x.replace(/ /g,"")).includes(g.replace(/ /g,""))) return "bad";
+  }
+  return closeEnough(g, vs) ? "near" : "bad";
+}
+function checkInput(input, item){
+  if (isEndings()) return checkEnding(input, item);
+  if (isParts()) return checkParts(input, item);
+  return checkVocab(input, item);
+}
+
+/* ---- setup ---- */
+function currentSecs(){ return isEndings() ? endingSecs() : isParts() ? partsSecs() : vocabSecs(); }
+function modeUsesDir(){ return true; }
+function applyTheme(){ document.documentElement.classList.toggle("dark", !!st.dark); document.querySelector('meta[name=theme-color]').content = st.dark ? "#141821" : "#f6f4ef"; }
+function applyDir(){ $("dirBtn").textContent = st.dir==="en" ? "EN→LA" : "LA→EN"; }
+function setMode(m){
+  st.mode=m; save("mode",m);
+  document.querySelectorAll("#modes button").forEach(b=>b.classList.toggle("on", b.dataset.m===m));
+  const allowed = currentSecs().map(x=>x[0]);
+  if (!allowed.includes(st.deck)) { st.deck="All"; save("deck","All"); }
+  buildChips(); restart();
+}
+function buildChips(){
+  const box = $("decks"); box.innerHTML = "";
+  currentSecs().forEach(([k,label]) => {
+    let n;
+    if (isEndings()) n = k==="All" ? FORMS.length : k==="Hard" ? FORMS.filter(f=>hard.has(f.id)).length : FORMS.filter(f=>f.tense===k).length;
+    else if (isParts()) n = k==="Hard" ? VERBS.filter(w=>hard.has("p-"+w.id)).length : VERBS.length;
+    else n = k==="All" ? WORDS.length : k==="Hard" ? WORDS.filter(w=>hard.has(w.id)).length : WORDS.filter(w=>w.s===k).length;
+    const b = document.createElement("button");
+    b.textContent = `${label} (${n})`; b.className = st.deck===k ? "on" : "";
+    b.onclick = () => { st.deck=k; save("deck",k); buildChips(); restart(); };
+    box.appendChild(b);
+  });
+}
+
+function restart(){
+  queue = shuffle(deckItems()); startCount = queue.length;
+  score = 0; streak = 0; seen = 0;
+  next();
+}
+function updStats(){
+  const left = queue.length + (cur ? 1 : 0);
+  $("sScore").textContent = `Score ${score}/${seen}`;
+  $("sStreak").textContent = `Streak ${streak}${best>1?" · best "+best:""}`;
+  $("sLeft").textContent = `${left} left`;
+  const done = startCount ? (startCount - left)/startCount : 0;
+  $("prog").style.width = Math.max(0,Math.min(100,done*100)) + "%";
+}
+function markHard(item, isHard){
+  const id = itemId(item);
+  if (isHard) hard.add(id); else hard.delete(id);
+  save("hard", [...hard]); buildChips();
+}
+function record(ok){
+  seen++;
+  if (ok){ score++; streak++; best=Math.max(best,streak); } else streak = 0;
+}
+
+function next(){
+  cur = queue.shift() || null; flipped = false; answered = false;
+  updStats();
+  if (!cur) return finish();
+  renderCurrent();
+}
+function renderCurrent(){
+  const practice = currentPractice();
+  ({cards:renderCard, type:renderType, quiz:renderQuiz})[practice]();
+}
+function currentPractice(){
+  if (st.mode==="cards"||st.mode==="type"||st.mode==="quiz") return st.mode;
+  return st.practice || "type";
+}
+
+function cardHead(item){
+  let sec = "";
+  if (isEndings()) sec = TENSE_LAB[item.tense];
+  else if (isParts()) sec = "principal parts";
+  else sec = item.s==="verb" ? "verb" : "";
+  return `${sec?`<span class="sec">${esc(sec)}</span>`:""}${hard.has(itemId(item))?'<span class="star">★</span>':''}`;
+}
+function practiceBar(){
+  if (!isParts() && !isEndings()) return "";
+  const p = currentPractice();
+  return `<div class="row chips" style="margin-top:0" id="practice">
+    <button data-p="cards" class="${p==="cards"?"on":""}">Flashcards</button>
+    <button data-p="type" class="${p==="type"?"on":""}">Type it</button>
+    <button data-p="quiz" class="${p==="quiz"?"on":""}">Quiz</button>
+  </div>`;
+}
+function bindPractice(){
+  const box = $("practice"); if (!box) return;
+  box.querySelectorAll("button").forEach(b => b.onclick = ev => {
+    ev.stopPropagation();
+    st.practice = b.dataset.p; save("practice", st.practice);
+    restart();
+  });
+}
+
+function labText(flipped){
+  if (isEndings()){
+    if (st.dir==="en") return flipped ? "Latin" : "English → Latin form";
+    return flipped ? "English" : "Latin form";
+  }
+  if (isParts()){
+    return flipped
+      ? (st.dir==="en"?"Latin principal parts":"English")
+      : (st.dir==="en"?"English → principal parts":"Latin");
+  }
+  return flipped ? (st.dir==="en"?"Latin":"English") : (st.dir==="en"?"English":"Latin");
+}
+
+/* ---- Flashcards ---- */
+function renderCard(){
+  const w = cur;
+  const hint = isEndings() && w.hint && !flipped ? `<div class="sub">${TENSE_LAB[w.tense]} tense</div>` : "";
+  const extra = flipped && isEndings() ? `<div class="sub">${esc(w.lemma)} · ${esc(w.en)}</div>` : "";
+  $("stage").innerHTML = `
+   ${practiceBar()}
+   <div class="card" id="fc">${cardHead(w)}
+     <span class="lab">${labText(flipped)}</span>
+     <div class="big">${esc(flipped ? answerShown(w) : promptOf(w))}</div>
+     ${flipped ? `<div class="sub">${esc(promptOf(w))}</div>${extra}` : `${hint}<div class="sub">Say it out loud, then tap to check</div>`}
+   </div>
+   ${flipped ? `<div class="btns"><button class="b-bad" id="no">← Still learning</button><button class="b-ok" id="yes">I knew it →</button></div>`
+             : `<button class="main" id="flip">Show answer</button>`}
+   <p class="hint">Tap card or Space to flip · ← still learning · → knew it</p>`;
+  bindPractice();
+  $("fc").onclick = flip;
+  if (flipped){ $("no").onclick = ev => { ev.stopPropagation(); grade(false); }; $("yes").onclick = ev => { ev.stopPropagation(); grade(true); }; }
+  else $("flip").onclick = ev => { ev.stopPropagation(); flip(); };
+}
+function flip(){ if (currentPractice()!=="cards"||!cur) return; flipped = !flipped; renderCard(); }
+function grade(ok){
+  if (!cur || currentPractice()!=="cards") return;
+  if (!flipped){ flipped = true; renderCard(); return; }
+  record(ok);
+  if (ok){ if (st.deck==="Hard") markHard(cur,false); }
+  else { markHard(cur,true); queue.splice(Math.min(queue.length, 4+Math.floor(Math.random()*4)), 0, cur); startCount++; }
+  next();
+}
+
+/* ---- Type it ---- */
+const ACC = ["ā","ē","ī","ō","ū"];
+function typeHint(){
+  if (isEndings() && st.dir!=="en") return "Macrons don't matter. Enter to check, Enter again for next. Example: we raised";
+  if (isEndings()) return "Macrons don't matter. Enter to check, Enter again for next.";
+  if (isParts() && st.dir==="en") return "Type all three parts, commas optional. Macrons don't matter.";
+  if (st.dir==="en") return "Macrons and capitals don't matter. For verbs, the first part is enough (e.g. aedifico).";
+  return "Capitals don't matter. Any one meaning on the list is enough.";
+}
+function typePlaceholder(){
+  if (isEndings()) return st.dir==="en" ? "Type the Latin form…" : "Type the English… e.g. we raised";
+  if (isParts()) return st.dir==="en" ? "e.g. aedifico, aedificare, aedificavi" : "Type the English…";
+  return st.dir==="en" ? "Type in Latin…" : "Type in English…";
+}
+function needsAccents(){
+  return st.dir==="en"; // typing Latin
+}
+function renderType(){
+  const w = cur;
+  const hint = isEndings() && w.hint && st.dir!=="en" ? `<div class="sub">${TENSE_LAB[w.tense]} tense</div>` : "";
+  $("stage").innerHTML = `
+   ${practiceBar()}
+   <div class="card" style="cursor:default;min-height:170px">${cardHead(w)}
+     <span class="lab">${labText(false)}</span>
+     <div class="big">${esc(promptOf(w))}</div>
+     ${hint}
+   </div>
+   <input type="text" id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${esc(typePlaceholder())}">
+   ${needsAccents()?`<div class="acc">${ACC.map(a=>`<button data-a="${a}">${a}</button>`).join("")}</div>`:""}
+   <div class="fb" id="fb"></div>
+   <div class="btns" id="tbtns"><button class="b-sec" id="skip">Show me</button><button class="b-ok" id="go">Check</button></div>
+   <p class="hint">${esc(typeHint())}</p>`;
+  bindPractice();
+  const inp = $("ans"); setTimeout(()=>inp.focus(), 50);
+  document.querySelectorAll(".acc button").forEach(b => b.onclick = () => {
+    const s=inp.selectionStart??inp.value.length, e=inp.selectionEnd??s;
+    inp.value = inp.value.slice(0,s)+b.dataset.a+inp.value.slice(e); inp.focus(); inp.setSelectionRange(s+1,s+1);
+  });
+  inp.addEventListener("keydown", e => { if (e.key==="Enter"){ e.preventDefault(); answered ? next() : submitType(); } });
+  $("go").onclick = () => answered ? next() : submitType();
+  $("skip").onclick = () => submitType(true);
+}
+function submitType(giveUp){
+  if (answered) return; answered = true;
+  const w = cur, inp = $("ans"), fb = $("fb");
+  const r = giveUp ? "bad" : checkInput(inp.value, w);
+  inp.blur();
+  const shown = answerShown(w);
+  if (r==="ok"){ fb.className="fb ok"; fb.innerHTML = `✓ Correct! <b>${esc(shown)}</b>`; record(true); if (st.deck==="Hard") markHard(w,false); }
+  else if (r==="near"){ fb.className="fb near"; fb.innerHTML = `Nearly! Check the spelling: <b>${esc(shown)}</b><br><span class="small">Counted as right, and added to ★ Hard ones.</span>`; record(true); markHard(w,true); }
+  else { fb.className="fb bad"; fb.innerHTML = `${giveUp?"":"✗ Not quite. "}Answer: <b>${esc(shown)}</b>${inp.value.trim()?`<br><span class="small">You wrote: ${esc(inp.value)}</span>`:""}
+     <br><button class="link" id="override">I was right, count it</button>`; record(false); markHard(w,true);
+     queue.splice(Math.min(queue.length,5), 0, w); startCount++;
+     $("override").onclick = () => { score++; streak = 1; const i=queue.indexOf(w); if(i>=0){ queue.splice(i,1); startCount--; } markHard(w,false); toast("Counted ✓"); next(); };
+  }
+  $("tbtns").innerHTML = `<button class="main" id="nx">Next →</button>`;
+  $("nx").onclick = next; $("nx").focus();
+  updStats();
+}
+
+/* ---- Quiz ---- */
+function quizPool(){
+  if (isEndings()) return FORMS;
+  if (isParts()) return VERBS;
+  return WORDS;
+}
+function renderQuiz(){
+  const w = cur, ans = answerShown(w);
+  const pool = quizPool().filter(x => itemId(x)!==itemId(w) && answerShown(x)!==ans);
+  let same;
+  if (isEndings()) same = shuffle(pool.filter(x => x.vid===w.vid || x.tense===w.tense || x.person===w.person));
+  else if (isParts()) same = shuffle(pool);
+  else same = shuffle(pool.filter(x => x.s===w.s));
+  const picks = [];
+  for (const x of same){ if (picks.length>=3) break; if (!picks.includes(x)) picks.push(x); }
+  while (picks.length<3 && pool.length){ const x = pool[Math.floor(Math.random()*pool.length)]; if (x && !picks.includes(x) && answerShown(x)!==ans) picks.push(x); }
+  const opts = shuffle([w, ...picks.slice(0,3)]);
+  const hint = isEndings() && w.hint && st.dir!=="en" ? `<div class="sub">${TENSE_LAB[w.tense]} tense</div>` : "";
+  $("stage").innerHTML = `
+   ${practiceBar()}
+   <div class="card" style="cursor:default;min-height:170px">${cardHead(w)}
+     <span class="lab">${st.dir==="en"? (isEndings()?"Pick the Latin form": isParts()?"Pick the principal parts":"Pick the Latin") : "Pick the English"}</span>
+     <div class="big">${esc(promptOf(w))}</div>
+     ${hint}
+   </div>
+   <div class="opts">${opts.map((o,i)=>`<button data-id="${itemId(o)}"><span class="small">${i+1}</span>&nbsp; ${esc(answerShown(o))}</button>`).join("")}</div>
+   <div class="fb" id="fb"></div>
+   <p class="hint">Tap an answer or press 1–4 · Enter for next</p>`;
+  bindPractice();
+  document.querySelectorAll(".opts button").forEach(b => b.onclick = () => pickQuiz(b));
+}
+function pickQuiz(b){
+  if (answered){ next(); return; }
+  answered = true;
+  const w = cur, ok = b.dataset.id===itemId(w);
+  document.querySelectorAll(".opts button").forEach(x => { if (x.dataset.id===itemId(w)) x.classList.add("right"); });
+  if (!ok){ b.classList.add("wrong"); markHard(w,true); queue.splice(Math.min(queue.length,5),0,w); startCount++; }
+  else if (st.deck==="Hard") markHard(w,false);
+  record(ok);
+  const fb=$("fb"); fb.className = ok?"fb ok":"fb bad";
+  fb.innerHTML = ok ? "✓ Yes!" : `✗ It's <b>${esc(answerShown(w))}</b>`;
+  updStats();
+  setTimeout(()=>{ if (answered && cur===w) next(); }, ok ? 800 : 2200);
+}
+
+/* ---- Finish ---- */
+function finish(){
+  updStats();
+  if (!startCount){
+    $("stage").innerHTML = `${practiceBar()}<div class="card" style="cursor:default"><div class="big">No ★ Hard ones yet</div><div class="sub">Cards you mark "Still learning" or get wrong land here. Pick another deck to start.</div></div>`;
+    bindPractice();
+    return;
+  }
+  const pct = seen ? Math.round(score/seen*100) : 0;
+  $("stage").innerHTML = `${practiceBar()}<div class="card done" style="cursor:default">
+    <div class="tick">✓</div><div class="big">Deck done!</div>
+    <div class="sub">${score}/${seen} right (${pct}%) · best streak ${best}</div>
+    <div class="sub">★ Hard ones now: ${currentHardCount()}</div></div>
+    <div class="btns">${currentHardCount()?`<button class="b-bad" id="goHard">Practise ★ Hard ones</button>`:""}<button class="b-ok" id="again">Go again</button></div>`;
+  bindPractice();
+  $("again").onclick = restart;
+  if ($("goHard")) $("goHard").onclick = () => { st.deck="Hard"; save("deck","Hard"); buildChips(); restart(); };
+  confetti();
+}
+function currentHardCount(){
+  if (isEndings()) return FORMS.filter(f=>hard.has(f.id)).length;
+  if (isParts()) return VERBS.filter(w=>hard.has("p-"+w.id)).length;
+  return WORDS.filter(w=>hard.has(w.id)).length;
+}
+function confetti(){
+  const box=$("confetti"), cols=["#4f6bed","#1f9d6b","#d98a1f","#e0559b","#5bc0de"];
+  for(let i=0;i<60;i++){ const e=document.createElement("i"); e.style.left=Math.random()*100+"vw"; e.style.background=cols[i%5]; e.style.animationDelay=Math.random()*.6+"s"; e.style.transform=`rotate(${Math.random()*360}deg)`; box.appendChild(e); }
+  setTimeout(()=>box.innerHTML="",3200);
+}
+
+/* ---- keyboard ---- */
+document.addEventListener("keydown", e => {
+  if (e.target.tagName==="INPUT") return;
+  if (currentPractice()==="cards"){
+    if (e.key===" "||e.key==="ArrowUp"||e.key==="ArrowDown"){ e.preventDefault(); flip(); }
+    else if (e.key==="ArrowLeft") grade(false);
+    else if (e.key==="ArrowRight") grade(true);
+  } else if (currentPractice()==="quiz"){
+    if (/^[1-4]$/.test(e.key)){ const b=document.querySelectorAll(".opts button")[+e.key-1]; if (b) pickQuiz(b); }
+    else if (e.key==="Enter" && answered) next();
+  } else if (currentPractice()==="type" && e.key==="Enter" && answered){ next(); }
+});
+
+$("themeBtn").onclick = () => { st.dark=!st.dark; save("dark",st.dark); applyTheme(); };
+$("dirBtn").onclick = () => { st.dir = st.dir==="en"?"la":"en"; save("dir",st.dir); applyDir(); restart(); };
+document.querySelectorAll("#modes button").forEach(b => b.onclick = () => setMode(b.dataset.m));
+$("restart").onclick = restart;
+$("clearHard").onclick = () => { if (confirm("Clear all ★ Hard ones?")){ hard.clear(); save("hard",[]); buildChips(); if (st.deck==="Hard") restart(); } };
+$("total").textContent = WORDS.length;
+
+st.practice = load("practice", "type");
+{ const h=location.hash.slice(1); if (["cards","type","quiz","parts","endings"].includes(h)) st.mode=h; if (h==="dark") st.dark=true; }
+if (!["cards","type","quiz","parts","endings"].includes(st.mode)) st.mode="cards";
+applyTheme(); applyDir();
+document.querySelectorAll("#modes button").forEach(b=>b.classList.toggle("on", b.dataset.m===st.mode));
+const allowed = currentSecs().map(x=>x[0]);
+if (!allowed.includes(st.deck)) st.deck="All";
+buildChips();
+restart();
+</script>
+</body>
+</html>
